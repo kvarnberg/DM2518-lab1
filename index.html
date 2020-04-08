@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="controllers">
+      <div id="installcont" class="controllers fs install">
+        <button id="fullscreen">Fullscreen/Exit fullscreen</button>
+        <button id="install">Install</button>
+      </div>
+      <div class="controllers zoom">
+        <button id="zoomIn">+</button>
+        <button id="zoomOut">-</button>
+      </div>
+      <div class="controllers pan">
+        <button id="panUp">Up</button>
+        <button id="panDown">Down</button>
+        <button id="panRight">Right</button>
+        <button id="panLeft">Left</button>
+      </div>
+      <div class="controllers locations">
+        <button id="recenter">Recenter map</button>
+        <button id="tc">
+          Centralstationen
+        </button>
+        <button id="tv-huset">TV-huset</button>
+        <button id="hem">Hem</button>
+        <button id="current">Current position</button>
+      </div>
+    </div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 59.346987, lng: 18.067903 },
+          zoom: 16,
+          mapTypeId: "hybrid",
+          disableDefaultUI: true,
+          tilt: 45,
+          zoomControl: false,
+          gestureHandling: "none",
+        });
+        initZoom(map);
+        initPan(map);
+
+        var locateinfowindow = new google.maps.InfoWindow();
+
+        document.getElementById("current").onclick = () => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              function (position) {
+                var pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+
+                locateinfowindow.setPosition(pos);
+                locateinfowindow.setContent("Location found!");
+                locateinfowindow.open(map);
+                map.setCenter(pos);
+              },
+              function () {
+                handleLocationError(true, locateinfowindow, map.getCenter());
+              }
+            );
+          } else {
+            handleLocationError(false, locateinfowindow, map.getCenter());
+          }
+        };
+
+        var marker = new google.maps.Marker({
+          map: map,
+          animation: google.maps.Animation.DROP,
+          title: "KTH",
+          position: { lat: 59.3498092, lng: 18.0684758 },
+        });
+        // marker.addListener("mouseover", toggleBounce);
+        marker.addListener("click", function () {
+          infowindowKTH.open(map, marker);
+        });
+
+        var movableMarker = new google.maps.Marker({
+          map: map,
+          animation: google.maps.Animation.DROP,
+          title: "I can Mooooove",
+          position: { lat: 59.346047, lng: 18.062827 },
+          draggable: true,
+        });
+        movableMarker.addListener("click", function () {
+          infowindowDrag.open(map, movableMarker);
+        });
+
+        var contentStringKTH =
+          "<div>" +
+          "<h2>" +
+          "KTH" +
+          "</h2>" +
+          "<p>" +
+          "This is the KTH Royal Institute of Technology" +
+          "</p>" +
+          "</div>";
+
+        var contentStringDrag =
+          "<div>" + "<p>" + "This marker is draggable." + "</p>" + "</div>";
+
+        var infowindowKTH = new google.maps.InfoWindow({
+          content: contentStringKTH,
+        });
+
+        var infowindowDrag = new google.maps.InfoWindow({
+          content: contentStringDrag,
+        });
+
+        function toggleBounce() {
+          if (marker.getAnimation() !== null) {
+            marker.setAnimation(null);
+          } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+          }
+        }
+
+        var tc = document.getElementById("tc");
+        tc.addEventListener("click", function () {
+          map.setCenter({ lat: 59.330645, lng: 18.058283 });
+          var marker = new google.maps.Marker({
+            map: map,
+            animation: google.maps.Animation.DROP,
+            title: "tc",
+            position: { lat: 59.330645, lng: 18.058283 },
+          });
+        });
+
+        var tvhus = document.getElementById("tv-huset");
+        tvhus.addEventListener("click", function () {
+          map.setCenter({ lat: 59.336527, lng: 18.102395 });
+          var marker = new google.maps.Marker({
+            map: map,
+            animation: google.maps.Animation.DROP,
+            title: "tv-huset",
+            position: { lat: 59.336527, lng: 18.102395 },
+          });
+        });
+        var hem = document.getElementById("hem");
+        hem.addEventListener("click", function () {
+          map.setCenter({ lat: 59.346648, lng: 18.058949 });
+          var marker = new google.maps.Marker({
+            map: map,
+            animation: google.maps.Animation.DROP,
+            title: "hem",
+            position: { lat: 59.346648, lng: 18.058949 },
+          });
+        });
+        var recenter = document.getElementById("recenter");
+        recenter.addEventListener("click", function () {
+          map.setCenter({ lat: 59.346987, lng: 18.067903 });
+        });
+      }
+
+      var fs = document.getElementById("fullscreen");
+      fs.addEventListener("click", toggleFullscreen);
+
+      function toggleFullscreen() {
+        var doc = window.document;
+        var el = window.document.documentElement;
+        if (
+          document.fullscreenElement ||
+          document.mozFullScreenElement ||
+          document.webkitFullscreenElement ||
+          document.msFullscreenElement
+        ) {
+          if (document.exitFullscreen) {
+            doc.exitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            doc.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            doc.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) {
+            doc.msExitFullscreen();
+          }
+        } else {
+          if (document.documentElement.requestFullscreen) {
+            el.requestFullscreen();
+          } else if (document.documentElement.mozRequestFullScreen) {
+            el.mozRequestFullScreen();
+          } else if (document.documentElement.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+          } else if (document.documentElement.msRequestFullscreen) {
+            el.msRequestFullscreen();
+          } else {
+            console.warn(
+              "Did not find a requestFullScreen method on this element",
+              el
+            );
+          }
+        }
+      }
+      function handleLocationError(browserHasGeolocation, infowindow, pos) {
+        infowindow.setPosition(pos);
+        infowindow.setContent(
+          browserHasGeolocation
+            ? "Error: The Geolocation service failed"
+            : "Error: Your browser doesn't suppoer Geolocation"
+        );
+        infowindow.open(map);
+      }
+    </script>
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?callback=initMap"
+    ></script>
+    <script>
+      function initZoom(map) {
+        document.getElementById("zoomIn").onclick = () => {
+          map.setZoom(map.getZoom() + 1);
+        };
+        document.getElementById("zoomOut").onclick = () => {
+          map.setZoom(map.getZoom() - 1);
+        };
+      }
+      function initPan(map) {
+        document.getElementById("panUp").onclick = () => {
+          map.panBy(0, -200);
+        };
+        document.getElementById("panDown").onclick = () => {
+          map.panBy(0, 200);
+        };
+        document.getElementById("panRight").onclick = () => {
+          map.panBy(200, 0);
+        };
+        document.getElementById("panLeft").onclick = () => {
+          map.panBy(-200, 0);
+        };
+      }
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorkerContainer
+          .register("serviceworker.js")
+          .then((reg) => {
+            // registration worked
+            console.log("Registration succeeded. Scope is " + reg.scope);
+          })
+          .catch((error) => {
+            // registration failed
+            console.log("Registration failed with " + error);
+          });
+      }
+    </script>
+  </body>
+</html>
