@@ -1,0 +1,12 @@
+{
+  "liveServer.settings.port": 5501,
+  "liveServer.settings.root": "/ex1/public/",
+  "liveServer.settings.host": "192.168.1.18",
+  "liveServer.settings.CustomBrowser": "chrome",
+  "liveServer.settings.https": {
+    "enable": true,
+    "cert": "/Users/josephinekvarnberg/Documents/Mobut/Lab1/ex1/public/https/localhost.pem",
+    "key": "/Users/josephinekvarnberg/Documents/Mobut/Lab1/ex1/public/https/localhost.key",
+    "passphrase": "12345"
+  }
+}
